@@ -14,6 +14,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.text.MessageFormat;
 import java.util.Scanner;
 
+import br.com.timoteobrasil.alura.sevendays.client.ImdbApiClient;
 import br.com.timoteobrasil.alura.sevendays.model.Top250Data;
 import br.com.timoteobrasil.alura.sevendays.parser.Top250DataParser;
 import br.com.timoteobrasil.alura.sevendays.view.HtmlGenerator;
@@ -26,8 +27,6 @@ public class App {
 
     private static final Logger LOGGER = LoggerFinder.getLoggerFinder().getLogger(App.class.getName(), App.class.getModule());
 
-    //TODO externalizar essa URI
-    private static final String URI_IMDB_TOP_250 = "https://imdb-api.com/en/API/Top250Movies/{apiKey}";
     public static void main( String[] args ) {
         // Dia 4: ainda fazendo tudo no mainzão
         File tempFile = new File("list.html");
@@ -38,14 +37,10 @@ public class App {
             System.out.print("Chave da api: ");
             String chave = in.next().trim();
             if(chave != null) {
-                URI uriComChave = URI.create(URI_IMDB_TOP_250.replace("{apiKey}", chave));
-                HttpRequest request = HttpRequest.newBuilder().uri(uriComChave).GET().build();
-                HttpResponse<String> response = HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
-                LOGGER.log(Level.INFO, "Response Status Code: "+ response.statusCode());
-                String jsonzao = response.body();
-                
+                ImdbApiClient client = new ImdbApiClient(chave);
                 Top250DataParser dataParser = new Top250DataParser();
-                Top250Data data = dataParser.parse(jsonzao);
+
+                Top250Data data = dataParser.parse(client.getBody());
 
                 HtmlGenerator generator = new HtmlGenerator(fileWriter);
                 generator.generate(data.getItems());

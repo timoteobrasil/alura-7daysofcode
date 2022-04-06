@@ -1,12 +1,19 @@
 package br.com.timoteobrasil.alura.sevendays.view;
 
 import java.io.PrintWriter;
+import java.lang.System.Logger;
+import java.lang.System.LoggerFinder;
+import java.lang.System.Logger.Level;
 import java.text.MessageFormat;
 import java.util.List;
 
 import br.com.timoteobrasil.alura.sevendays.model.Top250DataDetail;
 
 public class HtmlGenerator {
+
+    private static final Logger LOGGER = LoggerFinder.getLoggerFinder().getLogger(HtmlGenerator.class.getName(),
+            HtmlGenerator.class.getModule());
+
     private PrintWriter writer;
 
     private String template;
@@ -18,7 +25,9 @@ public class HtmlGenerator {
     }
 
     public void generate(List<Top250DataDetail> movies) {
+        LOGGER.log(Level.INFO, "Gerando saída HTML.");
         writer.println(MessageFormat.format(template, generateHead(), generateBody(movies)));
+        LOGGER.log(Level.INFO, "Geração de arquivo HTML concluída.");
     }
 
     private String initTemplate() {

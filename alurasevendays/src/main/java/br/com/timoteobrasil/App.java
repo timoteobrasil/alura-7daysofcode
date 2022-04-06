@@ -1,6 +1,8 @@
 package br.com.timoteobrasil;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.System.LoggerFinder;
@@ -14,6 +16,7 @@ import java.util.Scanner;
 
 import br.com.timoteobrasil.alura.sevendays.model.Top250Data;
 import br.com.timoteobrasil.alura.sevendays.parser.Top250DataParser;
+import br.com.timoteobrasil.alura.sevendays.view.HtmlGenerator;
 
 /**
  * Hello world!
@@ -26,8 +29,10 @@ public class App {
     //TODO externalizar essa URI
     private static final String URI_IMDB_TOP_250 = "https://imdb-api.com/en/API/Top250Movies/{apiKey}";
     public static void main( String[] args ) {
-        // Dia 3? 4?: ainda fazendo tudo no mainzão
-        try(Scanner in = new Scanner(System.in)) {
+        // Dia 4: ainda fazendo tudo no mainzão
+        File tempFile = new File("list.html");
+        try(Scanner in = new Scanner(System.in);
+            PrintWriter fileWriter = new PrintWriter(tempFile)) {
 
             //pegando a chave da api pela CLI
             System.out.print("Chave da api: ");
@@ -42,10 +47,8 @@ public class App {
                 Top250DataParser dataParser = new Top250DataParser();
                 Top250Data data = dataParser.parse(jsonzao);
 
-                data.getItems().forEach(item ->
-                    System.out.println(MessageFormat.format("{0}) [{1}] {2} ({3}) [{4}]", item.getRank(), item.getImDbRating(), item.getTitle(), item.getYear(), item.getImage()))
-                );
-                // String saida = MessageFormat.format("{4}) [{0}] {1} ({2}) [{3}]", ratings.get(i), titles.get(i), years.get(i), urlImages.get(i), i+1);
+                HtmlGenerator generator = new HtmlGenerator(fileWriter);
+                generator.generate(data.getItems());
 
             } else {
                 LOGGER.log(Level.INFO, "Chave de api não foi digitada.");
